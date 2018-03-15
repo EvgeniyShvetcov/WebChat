@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using WebChat.Infrastructure.MiddleWares;
+using WebChat.Infrastructure.Services;
 
 namespace WebChat
 {
@@ -21,6 +25,8 @@ namespace WebChat
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<UserConnectionsManagerService>();
+            services.AddSingleton<ChatWorkerService>();
             services.AddMvc();
         }
 
@@ -29,16 +35,16 @@ namespace WebChat
         {
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
-            else
+
+            var webSocketOptions = new WebSocketOptions
             {
-                app.UseExceptionHandler("/Error");
-            }
-
-            app.UseStaticFiles();
-
+                KeepAliveInterval = TimeSpan.FromSeconds(120),
+                ReceiveBufferSize = 4096
+            };
+            app.UseWebSockets(webSocketOptions);
+            app.UseMiddleware<WebSocketHandleMiddleWare>();
             app.UseMvc();
         }
     }
