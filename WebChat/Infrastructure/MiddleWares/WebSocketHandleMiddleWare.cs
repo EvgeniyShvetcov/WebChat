@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WebChat.Infrastructure.Services;
@@ -33,7 +34,7 @@ namespace WebChat.Infrastructure.MiddleWares
                 while (!socket.CloseStatus.HasValue)
                 {
                     var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
-                    var mesasge = JsonConvert.DeserializeObject<MessageDTO>(Convert.ToString(result));
+                    var mesasge = JsonConvert.DeserializeObject<MessageDTO>(Encoding.UTF8.GetString(buffer));
                     await _chatWorkerService.SendMessage(mesasge);
                 }
 

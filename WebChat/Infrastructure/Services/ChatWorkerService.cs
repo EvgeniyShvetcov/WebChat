@@ -24,7 +24,7 @@ namespace WebChat.Infrastructure.Services
             foreach(var connection in _userConnectionsManagerService.UserConnections)
             {
                 var json = JsonConvert.SerializeObject(message);
-                var arraySegment = new ArraySegment<byte>(Encoding.ASCII.GetBytes(json));
+                var arraySegment = new ArraySegment<byte>(Encoding.UTF8.GetBytes(json));
                 await connection.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
